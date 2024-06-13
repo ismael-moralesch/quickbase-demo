@@ -8,7 +8,7 @@ const options = yargs
  .option("s", { alias: "subdomain", describe: "Freshdesk subdomain", type: "string", demandOption: true })
  .argv;
 
-const URL_SERVICE_API = process.env.URL_SERVICE_API;
+const URL_SERVICE_API = `${process.env.URL_SERVICE_API}/v1/contacts/import`;
 
 axios.post(URL_SERVICE_API, {
     username: options.username,
