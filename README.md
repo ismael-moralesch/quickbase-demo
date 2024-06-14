@@ -18,4 +18,4 @@
 1. In the terminal, run: `npm run server`
 2. In a second terminal:
     go inside client folder 'client' by running `cd client`
-    run `node index.js -n <github username> -s <freshdesk subdomain>`
+    run `node index.js`

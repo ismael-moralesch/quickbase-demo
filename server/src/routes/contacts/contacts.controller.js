@@ -87,11 +87,12 @@ async function remove(req, res){
 Imports contact from github user and saves it in freshdesk and in mongo database
 */
 async function importContact(req, res){
-    const githubResponse = await getGithubUser(req.body.username).catch(httpErrorHandler);
+    const { username, subdomain } = req.body;
+    const githubResponse = await getGithubUser(username).catch(httpErrorHandler);
     if (!githubResponse.data) {
         if (githubResponse.status === 404) {
             return res.status(404).json({
-                error: `GitHub user with username '${req.body.username}' doesn't exist`
+                error: `GitHub user with username '${username}' doesn't exist`
             });
         }
         return res.status(githubResponse.status).json({
@@ -107,7 +108,7 @@ async function importContact(req, res){
         twitter_id: githubUser.twitter_username
     };
 
-    const freshDeskResponse = await getFreshdeskContactsByName(githubUser.login, req.body.subdomain).catch(httpErrorHandler);
+    const freshDeskResponse = await getFreshdeskContactsByName(githubUser.login, subdomain).catch(httpErrorHandler);
     if (!freshDeskResponse.data) {
         return res.status(freshDeskResponse.status).json({
             error: `Get Freshdesk Contact failed with message: ${freshDeskResponse.error}`
@@ -116,9 +117,9 @@ async function importContact(req, res){
     let creationResponse;
     if (freshDeskResponse.data.length > 0) {
         for (let i = 0; i < freshDeskResponse.data.length; i++) {
-            const contactResponse = await getFreshdeskContactById(freshDeskResponse.data[i].id, req.body.subdomain);
+            const contactResponse = await getFreshdeskContactById(freshDeskResponse.data[i].id, subdomain);
             if (contactResponse.data.unique_external_id === githubUser.login) {
-                creationResponse = await updateFreshdeskContact(freshDeskResponse.data[i].id, freshDeskContact, req.body.subdomain).catch(httpErrorHandler);
+                creationResponse = await updateFreshdeskContact(freshDeskResponse.data[i].id, freshDeskContact, subdomain).catch(httpErrorHandler);
             }
         }
         if (!creationResponse.data) {
@@ -127,7 +128,7 @@ async function importContact(req, res){
             });
         }
     } else {
-        creationResponse = await createFreshdeskContact(freshDeskContact, req.body.subdomain).catch(httpErrorHandler);
+        creationResponse = await createFreshdeskContact(freshDeskContact, subdomain).catch(httpErrorHandler);
         if (!creationResponse.data) {
             return res.status(creationResponse.status).json({
                 error: `Update Freshdesk Contact failed with message: ${creationResponse.error}`
