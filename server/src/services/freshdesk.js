@@ -22,6 +22,14 @@ function getFreshdeskContactById(id, subdomain){
     return axios.get(`https://${subdomain}.${FRESHDESK_API_URL}${FRESHDESK_CONTACT_ENDPOINT}/${id}`, config);
 }
 
+function getFreshdeskContactByExternalId(externalId, subdomain){
+    const config = {
+        headers: { Authorization: `Basic ${new Buffer.from(FRESHDESK_API_TOKEN).toString('base64')}` }
+    }
+
+    return axios.get(`https://${subdomain}.${FRESHDESK_API_URL}${FRESHDESK_CONTACT_ENDPOINT}?unique_external_id=${externalId}`, config);
+}
+
 function getFreshdeskContactsByName(name, subdomain){
     const config = {
         headers: { Authorization: `Basic ${new Buffer.from(FRESHDESK_API_TOKEN).toString('base64')}` }
@@ -50,5 +58,6 @@ module.exports = {
     getFreshdeskContactsByName,
     updateFreshdeskContact,
     httpErrorHandler,
-    getFreshdeskContactById
+    getFreshdeskContactById,
+    getFreshdeskContactByExternalId
 }
